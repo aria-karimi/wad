@@ -1,0 +1,78 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.pytype/
+.hypothesis/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Virtual environments and Python packaging
+.venv/
+venv/
+env/
+ENV/
+.python-version
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+pip-wheel-metadata/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+*.local
+
+# Training data, models, and generated outputs
+/data/
+/datasets/
+/checkpoints/
+/models/
+/outputs/
+/runs/
+/logs/
+/cache/
+/tmp/
+/temp/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.hdf5
+*.joblib
+*.pkl
+*.pickle
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Frontend dependencies and generated files
+node_modules/
+/frontend/dist/
+/frontend/build/
+.npm/
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
