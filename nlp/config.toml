@@ -1,0 +1,10 @@
+[transcription]
+modelName = "small.en"      # Model to load: e.g. "tiny.en", "base.en", "small.en"
+device = "cpu"              # Hardware to run on: "cpu", "cuda", or "auto"
+computeType = "int8"        # Numerical precision: e.g. "int8", "float32", "float16"
+language = "en"             # Spoken language code: e.g. "en", "tr", "de"; requires a compatible model
+beamSize = 1                # Search width: positive integer, commonly 1 or 5.
+minSilenceDurationMs = 500  # Pause length required before processing speech, in milliseconds
+maxBufferDurationSec = 30   # Process this much audio even if no pause occurs, in seconds
+sampleRate = 16000          # Upstream audio sampling rate, in Hz. DON'T CHANGE! Whisper interprets NumPy audio as 16 kHz
+
