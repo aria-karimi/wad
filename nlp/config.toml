@@ -8,3 +8,20 @@ minSilenceDurationMs = 500  # Pause length required before processing speech, in
 maxBufferDurationSec = 30   # Process this much audio even if no pause occurs, in seconds
 sampleRate = 16000          # Upstream audio sampling rate, in Hz. DON'T CHANGE! Whisper interprets NumPy audio as 16 kHz
 
+[linguistic]
+modelName = "en_core_web_sm"    # Model to load: e.g. "en_core_web_sm", "en_core_web_md", "en_core_web_lg"
+vadThreshold = 0.5              # Speech probability threshold for this analyzer's VAD, 0-1
+vadMinSilenceDurationMs = 500   # Minimum silent gap used to separate speech intervals, in milliseconds
+historyWindowCount = 5          # Preceding audio window indices used for lexical novelty
+fillerTokenForms = [            # Exact case-insensitive token matches for filled pauses
+    "uh", "um", "er", "erm", "uhm",
+    ]
+enabledFeatures = [             # Comment out any features you don't want to emit
+    "speakingPace",             # Written words per minute
+    "averageSentenceLength",    # Written words per completed sentence
+    "questionCount",            # Completed questions assigned by sentence midpoint
+    "lexicalNovelty",           # New content lemmas / current distinct content lemmas
+    "lexicalDensity",           # Content-POS tokens / all alphabetic tokens
+    "fillerTokenCount",         # Matched transcribed filled pauses, including repetitions
+    "nonSpeechFraction",        # Fraction of audio classified as non-speech, 0-1
+]

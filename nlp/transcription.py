@@ -6,11 +6,9 @@ Accepts AudioWindow objects and produces TranscriptSegment objects.
 import tomllib
 from math import isclose
 from pathlib import Path
-
 import numpy as np
 from faster_whisper import WhisperModel
 from silero_vad import get_speech_timestamps, load_silero_vad
-
 from shared.contracts import AudioWindow, TranscriptSegment
 
 configPath = Path(__file__).with_name("config.toml")

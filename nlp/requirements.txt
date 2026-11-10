@@ -1,3 +1,4 @@
 faster-whisper
 numpy
 silero-vad
+spacy
