@@ -8,7 +8,7 @@ class AggregationError(ValueError):
     """Raised when an aggregation operation fails due to invalid input data."""
 
 
-CONTEXT_COLUMNS = [
+BASE_COLUMNS = [ #these are the columns and they shouldnt be the same as any feature names
     "lectureID",
     "windowIndex",
     "startSec",
@@ -18,91 +18,84 @@ CONTEXT_COLUMNS = [
     "secSinceTopicStart",
     "secSinceLectureStart",
 ]
+   
+def checkWindows(windows: list[AudioWindow]) -> None:
+        """
+        window indices are 0..N-1 without gaps.
+        Raise AggregationError if not.
+        """
+        for i, window in enumerate(windows):
+            if window.index != i:
+                raise AggregationError(f"Window {i} has windowIndex {window.index}, expected {i}")
+        
 
-def checkWindows(windows: list[AudioWindow], lectureID: str) -> None:
+class FeatureAggregator:
     """
-    Check that all windows have the same lectureID and are sorted by windowIndex.
-    Raise AggregationError if not.
+    Collects audio windows, features and topic boundaries for ONE lecture
+    as they arrive, and builds the time-aligned feature table on request.
     """
-    for i, window in enumerate(windows):
-        if window.lectureID != lectureID:
-            raise AggregationError(f"Window {i} has lectureID {window.lectureID}, expected {lectureID}")
-        if window.index != i:
-            raise AggregationError(f"Window {i} has windowIndex {window.windowIndex}, expected {i}")
+
+    def __init__(self, lectureID: str):
+        self.lectureID = lectureID
+        self.windows: dict[int, AudioWindow] = {}          # windowIndex -> AudioWindow
+        self.merged: dict[int, dict[str, float]] = {}      # windowIndex -> {featureName: value} 
+        self.topicStarts: set[float] = set()               # boundary times
+
+    def addWindow(self, window: AudioWindow) -> None:
+        if window.lectureID != self.lectureID:
+            raise AggregationError(f"Window has lectureID {window.lectureID}, expected {self.lectureID}")
+        if window.index in self.windows:
+            raise AggregationError(f"Window {window.index} was added twice.")
         if window.startSec >= window.endSec:
-            raise AggregationError(f"Window {i} has startSec {window.startSec} >= endSec {window.endSec}")
+            raise AggregationError(f"Window {window.index} has startSec >= endSec")
 
-def topicStartsAt(boundaries: Iterable[TopicBoundary],lectureID: str, lectureStart: float) -> list[float]:
-    starts = {lectureStart}
-    for b in boundaries:
-        if b.lectureID != lectureID:
-            raise AggregationError(f"TopicBoundary has lectureID {b.lectureID}, expected {lectureID}")
-      
-        starts.add(b.timeSec)
-    return sorted(starts)
+        self.windows[window.index] = window      #store the window
+        self.merged[window.index] = {}           #create its empty bucket for this window
 
-def aggregate( 
-    windows: Iterable[AudioWindow],
-    featureWindows: Iterable[FeatureWindow],
-    boundaries: Iterable[TopicBoundary] = (),
-) -> pd.DataFrame:
-    """
-    merged audio windows, feature windows, and topic boundaries for a single lecture into a single DataFrame.
-    DataFrame with one row per window, sorted by windowIndex."""
+    def addFeatures(self, fw: FeatureWindow) -> None:
+        if fw.lectureID != self.lectureID:
+            raise AggregationError(f"FeatureWindow has lectureID {fw.lectureID}, expected {self.lectureID}")
+        if fw.windowIndex not in self.merged:
+            raise AggregationError(f"FeatureWindow refers to window {fw.windowIndex}, which hasn't been added yet.")
 
-    lectureID = windows[0].lectureID
-    checkWindows(windows, lectureID)
-
-    # merge features per window
-
-    validIndices = set()
-    for w in windows:
-        validIndices.add(w.index)
-
-# keys are windowIndex (integer), values are dicts of features ( feature name(string),numerical value(float))
-    merged: dict[int, dict[str, float]] = {} 
-    for i in validIndices:
-        merged[i] = {} 
-
-    #adding the features from featureWindows to the merged dict
-    for fw in featureWindows:
-        if fw.lectureID != lectureID:
-            raise AggregationError(f"FeatureWindow has lectureID {fw.lectureID}, expected {lectureID}")
-        if fw.windowIndex not in validIndices:
-            raise AggregationError(f"FeatureWindow has windowIndex {fw.windowIndex}, which isnt a valid index for this lecture. index must be {min(validIndices)}-{max(validIndices)}).")
-    
-        row= merged[fw.windowIndex]
+        row = self.merged[fw.windowIndex]
         for featureName, featureValue in fw.features.items():
-            if featureName in row:
-              raise AggregationError( f"Feature '{featureName}' sent twice for window {fw.windowIndex}.")
-    
+            if featureName in BASE_COLUMNS:
+                raise AggregationError(f"Feature name '{featureName}' is reserved for a context column.")
+            # the new value replaces the old one
             row[featureName] = np.nan if featureValue is None else float(featureValue)
 
-    featureNames = sorted({featureName for row in merged.values() for featureName in row})
+    def addBoundaries(self, boundaries: Iterable[TopicBoundary]) -> None:
+        for b in boundaries:
+            if b.lectureID != self.lectureID:
+                raise AggregationError(f"TopicBoundary has lectureID {b.lectureID}, expected {self.lectureID}")
+            self.topicStarts.add(b.timeSec)
 
+    def getFeatures(self) -> pd.DataFrame:
+        windows = sorted(self.windows.values(), key=lambda w: w.index) #sort them by index so we can check for gaps and build the table in order
+        if not windows:
+            raise AggregationError("No audio windows given.")
+        checkWindows(windows) # gaps can only be checked once all windows are in
 
-    #topic and context columns
-    lectureStart = windows[0].startSec
-    topicStartsList = topicStartsAt(boundaries, lectureID, lectureStart)
+        featureNames = sorted({featureName for row in self.merged.values() for featureName in row})
 
-    records = [] # each row is a dictionary
-    for w in windows:
-        #A window must belong to 1 topic so we take the topic that is active at the midpoint of the window
-        midpoint = (w.startSec + w.endSec) / 2 
-       
-       # topic id is the last topic start that is <= window midpoint
-       # if I inserted x into this sorted list, at which position would it go?
-        topicID = 0
-        for i, start in enumerate(topicStartsList):
-            if start > midpoint: 
-                break
-            topicID = i   #if start <= midpoint, then this is the current topic
+        lectureStart = windows[0].startSec
+        topicStartsList = sorted(self.topicStarts | {lectureStart})
 
-        topicStart = topicStartsList[topicID]
-        isTopicStart= any(w.startSec <= t < w.endSec for t in topicStartsList)
-            
-        record = {
-                "lectureID": lectureID,
+        records = []
+        for w in windows:
+            midpoint = (w.startSec + w.endSec) / 2 #A window must belong to one topic so we use the midpoint to determine which topic it belongs to. 
+            topicID = 0
+            for i, start in enumerate(topicStartsList):
+                if start > midpoint:
+                    break
+                topicID = i
+
+            topicStart = topicStartsList[topicID]
+            isTopicStart = any(w.startSec <= t < w.endSec for t in topicStartsList)
+
+            record = {
+                "lectureID": self.lectureID,
                 "windowIndex": w.index,
                 "startSec": w.startSec,
                 "endSec": w.endSec,
@@ -111,12 +104,11 @@ def aggregate(
                 "secSinceTopicStart": max(0.0, midpoint - topicStart),
                 "secSinceLectureStart": midpoint - lectureStart,
             }
-        for featureName in featureNames:
-            record[featureName] = merged[w.index].get(featureName, np.nan)
-        records.append(record)
+            for featureName in featureNames:
+                record[featureName] = self.merged[w.index].get(featureName, np.nan)
+            records.append(record)
 
-    df = pd.DataFrame.from_records(records, columns=CONTEXT_COLUMNS + featureNames)
-    return df.astype({name: "float64" for name in featureNames})
+        df = pd.DataFrame.from_records(records, columns=BASE_COLUMNS + featureNames)
+        return df.astype({name: "float64" for name in featureNames})
 
-
-        
+ 
