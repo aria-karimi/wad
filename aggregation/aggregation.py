@@ -18,7 +18,7 @@ BASE_COLUMNS = [ #these are the columns and they shouldnt be the same as any fea
     "secSinceTopicStart",
     "secSinceLectureStart",
 ]
-   
+
 def checkWindows(windows: list[AudioWindow]) -> None:
         """
         window indices are 0..N-1 without gaps.
