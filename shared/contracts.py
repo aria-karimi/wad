@@ -100,10 +100,11 @@ class TopicBoundary:
     can be emitted after its corresponding timestamp.
 
     Attributes:
+        windowIndex: Index of the AudioWindow that contains the boundary timestamp.
         lectureID: Identifier of the source lecture/session.
         timeSec: Timestamp at which a new topic begins, relative
             to the beginning of the lecture.
     """
-
+    windowIndex: int
     lectureID: str
     timeSec: float
