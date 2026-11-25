@@ -25,3 +25,10 @@ enabledFeatures = [             # Comment out any features you don't want to emi
     "fillerTokenCount",         # Matched transcribed filled pauses, including repetitions
     "nonSpeechFraction",        # Fraction of audio classified as non-speech, 0-1
 ]
+
+[Semantic]
+modelName = "sentence-transformers/all-MiniLM-L6-v2"
+historyWindowCount = 5          # Preceding audio window indices used for semantic shift
+enabledFeatures = [
+    "semanticShift",            # Cosine distance between current and preceding content embeddings
+]

@@ -2,3 +2,4 @@ faster-whisper
 numpy
 silero-vad
 spacy
+sentence-transformers
