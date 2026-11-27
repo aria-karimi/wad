@@ -1,0 +1,7 @@
+# AudioInput için dosya okuma ve sayısal diziler.
+numpy
+soundfile
+# Örnekleme hızı dönüşümü, perde ve ses şiddeti ölçümü.
+praat-parselmouth
+# Hazır konuşma algılama modeli; PyTorch bağımlılığını da kurar.
+silero-vad
