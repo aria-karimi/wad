@@ -1,11 +1,73 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>When Attention Drops</title>
+	<title>When Attention Drops - Recorded Lecture Results</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
-  <h1>Recorded Lecture Results</h1>
-  <div id="transcript"></div>
-  <script src="app.js"></script>
+	<h1>Recorded Lecture Results</h1>
+	<p id="filename">integrals.wav</p>
+
+	<!-- The grey outer box. The table splits it into a left and a right column. -->
+	<table class="outer">
+		<tr>
+			<!-- LEFT COLUMN -->
+			<td class="left">
+
+				<!-- Card 1: Predicted Attention -->
+				<div class="card">
+					<h2 class="cardtitle">Predicted Attention</h2>
+					<p class="small">Illustrative preview</p>
+					<div class="empty"></div>
+				</div>
+
+				<!-- Card 2: Delivery and Content -->
+				<div class="card">
+					<table class="inner">
+						<tr>
+							<td class="featurelist">
+								<h2>Delivery and Content</h2>
+								<p class="group">Delivery</p>
+								<p class="feature selected">Speaking rate</p>
+								<p class="feature">Pausing</p>
+								<p class="feature">Pitch variation</p>
+								<p class="feature">Loudness variation</p>
+
+								<p class="group">Content</p>
+								<p class="feature">Lexical novelty</p>
+								<p class="feature">Sentence length</p>
+								<p class="feature">Semantic change</p>
+								<p class="feature">Questions</p>
+							</td>
+							<td class="graphcell">
+								<h2 class="cardtitle">Speaking Rate</h2>
+								<p class="small">Illustrative preview</p>
+								<div class="empty"></div>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<!-- Card 3: Audio player (empty for now) -->
+				<div class="card">
+					<div class="emptybar"></div>
+				</div>
+
+				<a class="back" href="index.html">Back</a>
+			</td>
+
+			<!-- RIGHT COLUMN -->
+			<td class="right">
+				<div class="card">
+					<h2>Lecture Transcript</h2>
+					<div class="card" id="transcript"></div>
+				</div>
+			</td>
+		</tr>
+	</table>
+
 </body>
+
 </html>

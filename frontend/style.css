@@ -1,0 +1,112 @@
+/* ---------- Whole page ---------- */
+
+body {
+	background-color: white;
+	font-family: Arial;
+	margin-left: 40px;
+}
+
+h1 {
+	font-size: 34px;
+}
+
+#filename {
+	color: grey;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/* ---------- Grey outer box (a table with one row, two columns) ---------- */
+
+.outer {
+	background-color: #E6E6E6;
+	border: 2px solid black;        /* not in slides: draws the outline */
+	border-radius: 30px;            /* not in slides: rounded corners */
+	padding: 15px;                  /* not in slides: space inside the box */
+	width: 95%;                     /* not in slides: how wide the table is */
+}
+
+.left {
+	width: 65%;
+	vertical-align: top;            /* not in slides: start content at the top of the cell */
+}
+
+.right {
+	vertical-align: top;
+}
+
+/* ---------- White cards ---------- */
+
+.card {
+	background-color: white;
+	border: 1px solid black;
+	border-radius: 20px;
+	padding: 15px;
+	margin-bottom: 12px;            /* like margin-left from the slides, but below the box */
+}
+
+.cardtitle {
+	color: #1F3A5F;
+	font-size: 20px;
+}
+
+.small {
+	color: grey;
+	font-size: 12px;
+}
+
+/* Empty areas where the graphs will go later */
+.empty {
+	height: 150px;                  /* not in slides: gives the empty area a size */
+}
+
+/* Empty area where the audio player will go later */
+.emptybar {
+	height: 30px;
+}
+
+/* ---------- Delivery and Content card ---------- */
+
+.inner {
+	width: 100%;
+}
+
+.featurelist {
+	width: 30%;
+	vertical-align: top;
+}
+
+.graphcell {
+	vertical-align: top;
+}
+
+.group {
+	font-size: 15px;
+}
+
+.feature {
+	font-size: 14px;
+	margin-left: 10px;
+}
+
+.selected {
+	background-color: #6A9FA3;
+	color: white;
+	border-radius: 10px;
+	padding-left: 5px;
+}
+
+/* ---------- Transcript ---------- */
+
+#transcript {
+	height: 560px;
+}
+
+/* ---------- Back link ---------- */
+
+.back {
+	color: #6A9FA3;
+	font-size: 18px;
+	font-weight: bold;
+	margin-left: 20px;
+}
